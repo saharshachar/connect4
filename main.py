@@ -26,6 +26,7 @@ def play_turn(board):
             row_num = get_row_location_for_input(board, col_num)
             return row_num, col_num
 
+
 def is_valid_turn(board, col_num):
     return board[0, col_num] == EMPTY_CELL_VALUE
 
@@ -41,6 +42,7 @@ def is_game_over():
 
 
 if __name__ == '__main__':
+    just_a_change = 5
     game_over_flag = False
     board_gama = creat_board()
     print(board_gama)
