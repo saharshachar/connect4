@@ -42,11 +42,13 @@ def is_game_over(board):
     for curr_row in range(NUM_ROWS):
         for curr_col in range(NUM_COLMS):
             down_combo = check_down_combo(board, curr_row, curr_col, board[curr_row, curr_col])
+            right_combo = check_right_combo(board, curr_row, curr_col, board[curr_row, curr_col])
             r_daig_combo = check_diag_combo(board, curr_row, curr_col, board[curr_row, curr_col], "right")
             l_daig_combo = check_diag_combo(board, curr_row, curr_col, board[curr_row, curr_col], "left")
-            # print(f"down {down_combo}, right {r_daig_combo}, left {l_daig_combo}")
             if down_combo in PLAYER_MARKS:
                 return PLAYER_MARKS.index(down_combo)
+            elif right_combo in PLAYER_MARKS:
+                return PLAYER_MARKS.index(right_combo)
             elif r_daig_combo in PLAYER_MARKS:
                 return PLAYER_MARKS.index(r_daig_combo)
             elif l_daig_combo in PLAYER_MARKS:
@@ -64,13 +66,23 @@ def check_down_combo(board, initial_row, initial_col, curr_player_mark):
         return curr_player_mark  # current player has a successful down combo
 
 
+def check_right_combo(board, initial_row, initial_col, curr_player_mark):
+    if not (NUM_COLMS - initial_col >= WINNING_STRIKE):
+        return EMPTY_CELL_VALUE  # no successful right combo
+    else:
+        for curr_col in range(initial_col, (initial_col + WINNING_STRIKE)):
+            if board[initial_row, curr_col] != curr_player_mark:
+                return EMPTY_CELL_VALUE  # no successful right combo
+        return curr_player_mark  # current player has a successful right combo
+
+
 def check_diag_combo(board, initial_row, initial_col, curr_player_mark, right_or_left_diag):
     if right_or_left_diag == "right":                             # right diagonal check
         initial_condi = NUM_COLMS - initial_col >= WINNING_STRIKE
         range_for_loop = range(initial_col, (initial_col + WINNING_STRIKE))
     else:                                                         # left diagonal check
         initial_condi = initial_col >= (WINNING_STRIKE - 1)
-        range_for_loop = range((initial_col - WINNING_STRIKE + 1), initial_col)
+        range_for_loop = np.flip(range((initial_col - WINNING_STRIKE + 1), initial_col+1))
 
     loop_index = 0
     if not (initial_condi and (NUM_ROWS - initial_row >= WINNING_STRIKE)):
@@ -92,13 +104,17 @@ if __name__ == '__main__':
     while not game_over_flag:
 
         for curr_player in range(NUM_OF_PLAYERS):
-            print(f"player {curr_player} what is your move?")
-            curr_row_num, curr_col_num = play_turn(board_game)
-            board_game[curr_row_num, curr_col_num] = PLAYER_MARKS[curr_player]
-            print(board_game)
-            winner = is_game_over(board_game)
-            for curr_player_mark in PLAYER_MARKS:
-                if winner == curr_player_mark:
-                    print(f"the winner is player number {PLAYER_MARKS.index(winner)}")
+            if not game_over_flag:
+                print(f"player {curr_player} what is your move?")
+                curr_row_num, curr_col_num = play_turn(board_game)
+                board_game[curr_row_num, curr_col_num] = PLAYER_MARKS[curr_player]
+                print(board_game)
+                winner = is_game_over(board_game)
+                if winner != EMPTY_CELL_VALUE:
+                    print(f"the winner is player number {winner}")
                     game_over_flag = True
+
+
+
+
 
